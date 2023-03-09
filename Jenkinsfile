@@ -8,8 +8,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Running build automation'
-                sh 'export JAVA_HOME=`/usr/libexec/java_home -v 11.0.17`'
-                sh './gradlew build --no-daemon'
+                sh 'export JAVA_HOME=`/usr/libexec/java_home -v 11.0.17` && java --version &&./gradlew build --no-daemon'
                 archiveArtifacts artifacts: 'dist/trainSchedule.zip'
             }
         }
