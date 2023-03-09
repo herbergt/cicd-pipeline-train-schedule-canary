@@ -2,12 +2,13 @@ pipeline {
     agent any
     environment {
         //be sure to replace "willbla" with your own Docker Hub username
-        DOCKER_IMAGE_NAME = "willbla/train-schedule"
+        DOCKER_IMAGE_NAME = "herbergt/train-schedule"
     }
     stages {
         stage('Build') {
             steps {
                 echo 'Running build automation'
+                sh 'export JAVA_HOME=`/usr/libexec/java_home -v 11.0.17`'
                 sh './gradlew build --no-daemon'
                 archiveArtifacts artifacts: 'dist/trainSchedule.zip'
             }
