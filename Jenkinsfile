@@ -1,14 +1,13 @@
 pipeline {
     agent any
     environment {
-        //be sure to replace "willbla" with your own Docker Hub username
         DOCKER_IMAGE_NAME = "herbergt/train-schedule"
     }
     stages {
         stage('Build') {
             steps {
                 echo 'Running build automation'
-                sh 'export JAVA_HOME=`/usr/libexec/java_home -v 11.0.17` && java --version &&./gradlew build --no-daemon'
+                sh 'export JAVA_HOME=`/usr/libexec/java_home -v 11.0.17` && ./gradlew build --no-daemon'
                 archiveArtifacts artifacts: 'dist/trainSchedule.zip'
             }
         }
@@ -38,15 +37,34 @@ pipeline {
                 }
             }
         }
+        stage('CanaryDeploy') {
+            when {
+                branch 'master'
+            }
+            environment {
+                CANARY_REPLICAS = 1
+            }
+            steps {
+                 withKubeConfig([credentialsId: 'kubeconfig']) {
+                     sh 'kubectl apply -f train-schedule-kube-canary.yml'
+                 }
+            }
+        }
         stage('DeployToProduction') {
             when {
                 branch 'master'
+            }
+            environment {
+                CANARY_REPLICAS = 0
             }
             steps {
                 input 'Deploy to Production?'
                 milestone(1)
                 withKubeConfig([credentialsId: 'kubeconfig']) {
-                  sh 'kubectl apply -f train-schedule-kube.yml'
+                    sh 'kubectl apply -f train-schedule-kube-canary.yml'
+                }
+                withKubeConfig([credentialsId: 'kubeconfig']) {
+                    sh 'kubectl apply -f train-schedule-kube.yml'
                 }
             }
         }
