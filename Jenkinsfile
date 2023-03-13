@@ -46,7 +46,7 @@ pipeline {
             }
             steps {
                  withKubeConfig([credentialsId: 'kubeconfig']) {
-                     sh "./kube-trigger.sh"
+                     sh " sh(returnStdout: true, script: 'export CANARY_REPLICAS=1 && envsubst < train-schedule-kube-canary.yml | kubectl apply -f -')"
                  }
             }
         }
