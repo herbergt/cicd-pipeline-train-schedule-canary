@@ -46,10 +46,7 @@ pipeline {
             }
             steps {
                  withKubeConfig([credentialsId: 'kubeconfig']) {
-                         def command = $/"export CANARY_REPLICAS=2 && envsubst < train-schedule-kube-canary.yml | kubectl apply -f -"/$
-                         res = sh(returnStdout: true, script: command).trim()
-                         sh("echo ${res}")
-                         sh("echo ${res}")
+                    sh(returnStdout: true, "export CANARY_REPLICAS=2 && envsubst < train-schedule-kube-canary.yml | kubectl apply -f -": command).trim()
                  }
             }
         }
