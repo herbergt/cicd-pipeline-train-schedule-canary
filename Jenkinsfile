@@ -61,7 +61,7 @@ pipeline {
                 input 'Deploy to Production?'
                 milestone(1)
                 withKubeConfig([credentialsId: 'kubeconfig']) {
-                    sh "export CANARY_REPLICAS=${env.CANARY_REPLICAS} && envsubst < train-schedule-kube-canary.yml | kubectl apply -f -"
+                    sh "/bin/bash -c 'export CANARY_REPLICAS=1 && envsubst < train-schedule-kube-canary.yml | kubectl apply -f -'"
                 }
                 withKubeConfig([credentialsId: 'kubeconfig']) {
                     sh "kubectl apply -f train-schedule-kube.yml"
