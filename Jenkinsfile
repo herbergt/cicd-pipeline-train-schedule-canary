@@ -66,7 +66,7 @@ pipeline {
                     sh "envsubst < train-schedule-kube-canary.yml | kubectl apply -f -"
                 }
                 withKubeConfig([credentialsId: 'kubeconfig']) {
-                    sh "kubectl apply -f train-schedule-kube.yml"
+                    sh "envsubst < train-schedule-kube.yml | kubectl apply -f -"
                 }
             }
         }
